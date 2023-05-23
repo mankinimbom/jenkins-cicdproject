@@ -127,5 +127,25 @@ pipeline {
         }
       }
     }
+    stage('Notify Slack') {
+      steps {
+        catchError(buildResult: 'FAILURE', stageResult: 'FAILURE') {
+          slackSend (
+            channel: "#random",
+            color: "good",
+            message: "Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL}) ran successfully"
+          )
+        }
+      }
+      post {
+        failure {
+          slackSend (
+            channel: "#random",
+            color: "danger",
+            message: "Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL}) failed"
+          )
+        }
+      }
+    }
   }
 }
